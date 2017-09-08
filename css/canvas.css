@@ -1,0 +1,28 @@
+.canvas-centered-container {
+    overflow: auto;
+    height: 100%;
+}
+
+.canvas-centered-container canvas {
+    display: block;
+    margin: 0 auto;
+}
+
+.pswp__caption  {
+    display: block !important;
+}
+
+.pswp__caption__center {
+    text-align: center;
+}
+
+.pswp__caption__center .pswp__button {
+    float: none;
+    display: inline-block;
+    color: #fff;
+}
+
+.pswp__button.pswp__button--icon {
+    background: none;
+    color: #fff;
+}
