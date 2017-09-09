@@ -6,13 +6,16 @@ var openPhotoSwipe = function() {
         {
             html: '<div class="canvas-centered-container"></div>',
             source: '/gallery/img/asm_overview.pdf',
-            rotate: 0
+            rotate: 0,
+            scale: 1
         },
         {
             src: 'https://farm7.staticflickr.com/6175/6176698785_7dee72237e_b.jpg',
             w: 1024,
             h: 683,
-            rotate: 0
+            rotate: 0,
+            rotationDeg: 90,
+            scale: 1
         }
     ];
 
@@ -54,7 +57,7 @@ var openPhotoSwipe = function() {
         var currItem = gallery.currItem;
         var canvasContainer = currItem.container.children[0];
         if (currItem.html && canvasContainer.children.length === 0) {
-            renderPdf(canvasContainer, currItem.source, currItem.rotate);
+            renderPdf(canvasContainer, currItem.source, currItem.scale, currItem.rotate);
         }
     });
 
@@ -62,25 +65,33 @@ var openPhotoSwipe = function() {
     var rotateLeftBtn = gallery.template.querySelectorAll(".pswp__button.pswp__button--rotate[data-rotate='left']")[0];
     var rotateRightBtn = gallery.template.querySelectorAll(".pswp__button.pswp__button--rotate[data-rotate='right']")[0];
     rotateLeftBtn.addEventListener("click", function () {
-        rotateItem(gallery.currItem, false);
+        rotateItem.call(gallery, gallery.currItem, false);
     });
     rotateRightBtn.addEventListener("click", function () {
-        rotateItem(gallery.currItem, true);
+        rotateItem.call(gallery, gallery.currItem, true);
     });
 
     var zoomInBtn = gallery.template.querySelectorAll(".pswp__button.pswp__button--zoom[data-zoom='in']")[0];
     var zoomOutBtn = gallery.template.querySelectorAll(".pswp__button.pswp__button--zoom[data-zoom='out']")[0];
+
+    zoomInBtn.addEventListener("click", function () {
+        scaleItem.call(gallery, gallery.currItem, false);
+    });
+
+    zoomOutBtn.addEventListener("click", function () {
+        scaleItem.call(gallery, gallery.currItem, true);
+    });
 };
 
 openPhotoSwipe();
 
-function renderPdf(el, source, rotate) {
-    var rotate = rotate || 0;
+function renderPdf(el, source, scale, rotate) {
+    var rotate = typeof rotate !== undefined ? rotate : 0;
+    var scale = typeof scale !== undefined ? scale : 1;
     var loadingTask = PDFJS.getDocument(source);
     loadingTask.promise.then(function (pdf) {
         for (var num = 1; num <= pdf.numPages; num++) {
             pdf.getPage(num).then(function (page) {
-                var scale = 1.5;
                 var viewport = page.getViewport(scale, rotate);
                 var canvas = document.createElement('canvas');
                 var context = canvas.getContext('2d');
@@ -110,7 +121,7 @@ function rotateItem(item, clockwise) {
             canvasContainer.removeChild(canvasContainer.firstChild);
         }
         if (canvasContainer.children.length === 0) {
-            renderPdf(canvasContainer, item.source, item.rotate);
+            renderPdf(canvasContainer, item.source, item.scale, item.rotate);
         }
     } else if (item.src) {
         var img = item.container.getElementsByTagName("img")[0];
@@ -120,5 +131,24 @@ function rotateItem(item, clockwise) {
         img.style.msTransform     = 'rotate('+deg+'deg)';
         img.style.oTransform      = 'rotate('+deg+'deg)';
         img.style.transform       = 'rotate('+deg+'deg)';
+    }
+}
+
+function scaleItem(item, out) {
+    var _out = typeof out !== undefined ? out : true;
+    var scale = item.scale + (_out ? -0.25 : 0.25);
+    if (scale > 0 && scale <= 3) {
+        item.scale =  scale;
+    }
+    if (item.source) {
+        var canvasContainer = item.container.children[0];
+        while (canvasContainer.firstChild) {
+            canvasContainer.removeChild(canvasContainer.firstChild);
+        }
+        if (canvasContainer.children.length === 0) {
+            renderPdf(canvasContainer, item.source, item.scale, item.rotate);
+        }
+    } else if (item.src) {
+        this.zoomTo(item.scale, {x:this.viewportSize.x/2,y:this.viewportSize.y/2}, 300, false);
     }
 }
