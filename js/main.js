@@ -7,7 +7,9 @@ var openPhotoSwipe = function() {
             html: '<div class="canvas-centered-container"></div>',
             source: '/gallery/img/asm_overview.pdf',
             rotate: 0,
-            scale: 1
+            scale: 1,
+            username: 'Поль Гоген',
+            docname: 'active shape model.'
         },
         {
             src: 'https://farm7.staticflickr.com/6175/6176698785_7dee72237e_b.jpg',
@@ -15,7 +17,9 @@ var openPhotoSwipe = function() {
             h: 683,
             rotate: 0,
             rotationDeg: 90,
-            scale: 1
+            scale: 1,
+            username: 'Габдулла Тукай',
+            docname: 'горы, нах. и ледники. где то в аргентине.'
         }
     ];
 
@@ -59,6 +63,11 @@ var openPhotoSwipe = function() {
         if (currItem.html && canvasContainer.children.length === 0) {
             renderPdf(canvasContainer, currItem.source, currItem.scale, currItem.rotate);
         }
+        var template = gallery.template;
+        var usernameEl = template.getElementsByClassName("pswp__meta__username")[0];
+        usernameEl.textContent = currItem.username;
+        var docnameEl = template.getElementsByClassName("pswp__meta__docname")[0];
+        docnameEl.textContent = currItem.docname;
     });
 
     gallery.init();

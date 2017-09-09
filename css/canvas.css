@@ -26,3 +26,21 @@
     background: none;
     color: #fff;
 }
+
+.pswp__top-bar {
+    height: 58px;
+}
+
+.pswp__meta {
+    position: absolute;
+    left: 0;
+    right: 0;
+    color: #ddd;
+    text-align: center;
+    padding: 5px 0;
+}
+
+.pswp__meta .pswp__meta__username {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
