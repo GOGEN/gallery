@@ -68,6 +68,8 @@ var openPhotoSwipe = function() {
         usernameEl.textContent = currItem.username;
         var docnameEl = template.getElementsByClassName("pswp__meta__docname")[0];
         docnameEl.textContent = currItem.docname;
+        var downloadEl = template.getElementsByClassName("pswp__button pswp__button--download")[0]
+        downloadEl.href = currItem.src || currItem.source;
     });
 
     gallery.init();
