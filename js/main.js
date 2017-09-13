@@ -1,8 +1,18 @@
+var pdfRenderingBlock = false;
+
 var openPhotoSwipe = function() {
     var pswpElement = document.querySelectorAll('.pswp')[0];
 
     // build items array
     var items = [
+        {
+            html: '<div class="canvas-centered-container"></div>',
+            source: '/gallery/img/testing.pdf',
+            rotate: 0,
+            scale: 1,
+            username: 'Поль Гоген',
+            docname: 'active shape model.'
+        },
         {
             html: '<div class="canvas-centered-container"></div>',
             source: '/gallery/img/asm_overview.pdf',
@@ -100,7 +110,7 @@ function renderPdf(el, source, scale, rotate) {
     var rotate = typeof rotate !== undefined ? rotate : 0;
     var scale = typeof scale !== undefined ? scale : 1;
     var loadingTask = PDFJS.getDocument(source);
-    loadingTask.promise.then(function (pdf) {
+    return loadingTask.promise.then(function (pdf) {
         for (var num = 1; num <= pdf.numPages; num++) {
             pdf.getPage(num).then(function (page) {
                 var viewport = page.getViewport(scale, rotate);
@@ -123,17 +133,19 @@ function renderPdf(el, source, scale, rotate) {
 }
 
 function rotateItem(item, clockwise) {
+    if (item.source && pdfRenderingBlock) { return; }
     var _clockwise = typeof clockwise !== undefined ? clockwise : true;
     var deg = item.rotate + (_clockwise ? 90 : -90);
     item.rotate = Math.abs(deg) === 360 ? 0 : deg;
     if (item.source) {
+        pdfRenderingBlock = true;
         var canvasContainer = item.container.children[0];
         while (canvasContainer.firstChild) {
             canvasContainer.removeChild(canvasContainer.firstChild);
         }
-        if (canvasContainer.children.length === 0) {
-            renderPdf(canvasContainer, item.source, item.scale, item.rotate);
-        }
+        renderPdf(canvasContainer, item.source, item.scale, item.rotate).then(function () {
+            pdfRenderingBlock = false;
+        });
     } else if (item.src) {
         var img = item.container.getElementsByTagName("img")[0];
         var deg = item.rotate;
@@ -146,19 +158,21 @@ function rotateItem(item, clockwise) {
 }
 
 function scaleItem(item, out) {
+    if (item.source && pdfRenderingBlock) { return; }
     var _out = typeof out !== undefined ? out : true;
     var scale = item.scale + (_out ? -0.25 : 0.25);
     if (scale > 0 && scale <= 3) {
         item.scale =  scale;
     }
     if (item.source) {
+        pdfRenderingBlock = true;
         var canvasContainer = item.container.children[0];
         while (canvasContainer.firstChild) {
             canvasContainer.removeChild(canvasContainer.firstChild);
         }
-        if (canvasContainer.children.length === 0) {
-            renderPdf(canvasContainer, item.source, item.scale, item.rotate);
-        }
+        renderPdf(canvasContainer, item.source, item.scale, item.rotate).then(function () {
+            pdfRenderingBlock = false;
+        });
     } else if (item.src) {
         this.zoomTo(item.scale, {x:this.viewportSize.x/2,y:this.viewportSize.y/2}, 300, false);
     }
